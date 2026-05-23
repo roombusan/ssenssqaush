@@ -241,9 +241,37 @@
                 type: 'match'
             });
 
-            alert(isWin ? "🎉 순위가 변경되었습니다!" : "결과가 반영되었습니다 (순위 유지)");
             comboChallenger.value = "";
             comboTarget.innerHTML = '<option value="">대상 선택</option>';
+
+            const newRank = isWin ? targetIdx + 1 : chIdx + 1;
+            const shareText = isWin
+                ? `🏆 SSENS SQUASH 경기 결과\n\n${challengerName} → ${targetName} 도전 승리!\n${challengerName} 선수가 ${newRank}위로 올라섰습니다! 🎉`
+                : `🏸 SSENS SQUASH 경기 결과\n\n${challengerName} → ${targetName} 도전 패배\n${challengerName} 선수의 순위가 유지됩니다.`;
+
+            showShareModal(isWin, shareText);
+        };
+
+        function showShareModal(isWin, shareText) {
+            const modal = document.getElementById('shareModal');
+            const title = document.getElementById('shareModalTitle');
+            const copyBtn = document.getElementById('shareCopyBtn');
+
+            title.textContent = isWin ? "🎉 순위가 변경되었습니다!" : "결과가 반영되었습니다 (순위 유지)";
+            modal.style.display = 'flex';
+
+            copyBtn.onclick = async () => {
+                await navigator.clipboard.writeText(shareText);
+                copyBtn.textContent = '✅ 복사 완료!';
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 복사하기';
+                    modal.style.display = 'none';
+                }, 1200);
+            };
+        }
+
+        window.closeShareModal = () => {
+            document.getElementById('shareModal').style.display = 'none';
         };
 
         // 되돌리기 기능
@@ -596,6 +624,64 @@
             font-weight: 600;
         }
 
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background: #1a1a2e;
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 340px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--accent);
+        }
+
+        .modal-question {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .modal-close-btn {
+            flex: 1;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            filter: none;
+            transform: none;
+        }
+
+        .modal-copy-btn {
+            flex: 2;
+        }
+
         /* 버튼 행 (모든 화면) */
         .button-row {
             display: flex;
@@ -737,6 +823,17 @@
 </head>
 
 <body>
+    <div id="shareModal" style="display:none;" class="modal-overlay" onclick="if(event.target===this)closeShareModal()">
+        <div class="modal-box">
+            <div id="shareModalTitle" class="modal-title"></div>
+            <div class="modal-question">결과 공유를 위해 복사하시겠습니까?</div>
+            <div class="modal-buttons">
+                <button class="modal-close-btn" onclick="closeShareModal()">닫기</button>
+                <button id="shareCopyBtn" class="modal-copy-btn">📋 복사하기</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <h1>🏆 SSENS SQUASH RANKING</h1>
         <div class="glass-panel" id="panel-ranking">
