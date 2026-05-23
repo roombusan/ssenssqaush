@@ -247,7 +247,7 @@
             const newRank = isWin ? targetIdx + 1 : chIdx + 1;
             const shareText = isWin
                 ? `🏆 SSENS SQUASH 경기 결과\n\n${challengerName} → ${targetName} 도전 승리!\n${challengerName} 선수가 ${newRank}위로 올라섰습니다! 🎉`
-                : `🏸 SSENS SQUASH 경기 결과\n\n${challengerName} → ${targetName} 도전 패배\n${challengerName} 선수의 순위가 유지됩니다.`;
+                : `🏸 SSENS SQUASH 경기 결과\n\n${chIdx + 1}위 ${challengerName} → ${targetIdx + 1}위 ${targetName} 도전 패배\n${challengerName} 선수의 순위가 유지됩니다.`;
 
             showShareModal(isWin, shareText);
         };
