@@ -195,9 +195,10 @@
             const chIdx = parseInt(comboChallenger.value);
             comboTarget.innerHTML = '<option value="">대상 선택</option>';
             if (isNaN(chIdx)) return;
-            // 위 4슬롯에 부상자가 있으면 5슬롯까지 확장
-            const base = players.slice(Math.max(0, chIdx - 4), chIdx);
-            const windowSize = base.some(n => INJURED.includes(n)) ? 5 : 4;
+            const isSpecial = document.getElementById('specialDayToggle').checked;
+            const baseWindow = isSpecial ? 6 : 4;
+            const base = players.slice(Math.max(0, chIdx - baseWindow), chIdx);
+            const windowSize = base.some(n => INJURED.includes(n)) ? baseWindow + 1 : baseWindow;
             for (let i = chIdx - 1; i >= Math.max(0, chIdx - windowSize); i--) {
                 if (INJURED.includes(players[i])) continue;
                 const opt = document.createElement('option');
@@ -537,6 +538,64 @@
             font-weight: 400;
         }
 
+        .special-day-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 0.6rem 0.8rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.05);
+            transition: 0.3s;
+        }
+
+        .special-day-toggle:has(input:checked) {
+            border-color: rgba(255, 215, 0, 0.7);
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+        }
+
+        .special-day-toggle input {
+            display: none;
+        }
+
+        .toggle-slider {
+            width: 38px;
+            height: 22px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 11px;
+            flex-shrink: 0;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: 0.3s;
+        }
+
+        .special-day-toggle input:checked ~ .toggle-slider {
+            background: #FFD700;
+        }
+
+        .special-day-toggle input:checked ~ .toggle-slider::after {
+            transform: translateX(16px);
+        }
+
+        .toggle-label {
+            font-size: 0.85rem;
+            color: #FFD700;
+            font-weight: 600;
+        }
+
         /* 버튼 행 (모든 화면) */
         .button-row {
             display: flex;
@@ -695,6 +754,11 @@
                         <option value="lose">패배 (순위 유지)</option>
                     </select>
                     <select id="editorName"></select>
+                    <label class="special-day-toggle">
+                        <input type="checkbox" id="specialDayToggle" onchange="updateTargetCombo()">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">⭐ 특별한 날 모드 (최대 6단계 위 도전)</span>
+                    </label>
                     <div class="button-row">
                         <button class="undo-btn" onclick="undoLastResult()">↩️ 되돌리기</button>
                         <button onclick="applyResult()">결과 반영하기</button>
